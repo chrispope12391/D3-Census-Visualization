@@ -46,6 +46,20 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
         data.healthcare = +data.healthcare;
         data.obesity = +data.obesity;
         data.smokes = +data.smokes;
+
+        var xTimeScale = d3.scaleTime()
+            .domain(d3.extent(stateData, d => d.age))
+            .range([0, width]);
+
+        var yLinearScale1 = d3.scaleLinear()
+            .domain([0, d3.max(stateData, d => d.smokes)])
+            .range([height, 0]);
+
+        // Create axis functions
+        var bottomAxis = d3.axisBottom(xTimeScale)
+        var leftAxis = d3.axisLeft(yLinearScale1);
+    
+    
     })
 }).catch(function(error) {
     console.log(error);
