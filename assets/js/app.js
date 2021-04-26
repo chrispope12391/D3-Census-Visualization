@@ -47,18 +47,29 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
         data.obesity = +data.obesity;
         data.smokes = +data.smokes;
 
-        var xTimeScale = d3.scaleTime()
-            .domain(d3.extent(stateData, d => d.age))
-            .range([0, width]);
+        var xLinearScale = d3.scaleLinear().range([0, width]);
 
-        var yLinearScale1 = d3.scaleLinear()
-            .domain([0, d3.max(stateData, d => d.smokes)])
+        var ageMax = d3.max(stateData, d => d.age);
+
+        xLinearScale.domain([0, ageMax]);
+
+        var yLinearScale = d3.scaleLinear()
+            .domain([0, d3.max(stateData, d => d.healthcare)])
             .range([height, 0]);
 
         // Create axis functions
-        var bottomAxis = d3.axisBottom(xTimeScale)
-        var leftAxis = d3.axisLeft(yLinearScale1);
+        var bottomAxis = d3.axisBottom(xLinearScale)
+        var leftAxis = d3.axisLeft(yLinearScale);
+
+        chartGroup.append("g")
+            .attr("transform", `translate(0, ${height})`)
+            .call(bottomAxis);
+
+        // Add y1-axis to the left side of the display
+        chartGroup.append("g").call(leftAxis);
+
     
+
     
     })
 }).catch(function(error) {
