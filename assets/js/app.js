@@ -35,9 +35,13 @@ var svg = d3.select("#scatter")
 var chartGroup = svg.append("g")
 .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-d3.csv("assets/data/data.csv").then(function(data) {
+d3.csv("assets/data/data.csv").then(function(stateData) {
 
-    console.log(data);
+    console.log(stateData);
+
+    stateData.forEach(function(data) {
+        data.poverty = +data.poverty;
+    })
 }).catch(function(error) {
     console.log(error);
 });
