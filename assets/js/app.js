@@ -46,32 +46,42 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
         data.healthcare = +data.healthcare;
         data.obesity = +data.obesity;
         data.smokes = +data.smokes;
+    });
 
-        var xLinearScale = d3.scaleLinear().range([0, width]);
+    var xLinearScale = d3.scaleLinear()
+    .range([0, width])
+    .domain(d3.extent(stateData, d => d.age));
 
-        var ageMax = d3.max(stateData, d => d.age);
+    var yLinearScale = d3.scaleLinear()
+    .range([height, 0])
+    .domain(d3.extent(stateData, d => d.smokes));
 
-        xLinearScale.domain([0, ageMax]);
 
-        var yLinearScale = d3.scaleLinear()
-            .domain([0, d3.max(stateData, d => d.healthcare)])
-            .range([height, 0]);
+    // var ageMax = d3.max(stateData, d => d.age);
+    // var smokesMax = d3.max(stateData, d => d.smokes);
 
-        // Create axis functions
-        var bottomAxis = d3.axisBottom(xLinearScale)
-        var leftAxis = d3.axisLeft(yLinearScale);
+    // Create axis functions
+    var bottomAxis = d3.axisBottom(xLinearScale)
+    var leftAxis = d3.axisLeft(yLinearScale);
 
-        chartGroup.append("g")
-            .attr("transform", `translate(0, ${height})`)
-            .call(bottomAxis);
+    chartGroup.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(bottomAxis);
 
-        // Add y1-axis to the left side of the display
-        chartGroup.append("g").call(leftAxis);
+    // Add y1-axis to the left side of the display
+    chartGroup.append("g").call(leftAxis);
 
-    
+    chartGroup.append("g")
+    .selectAll("circle")
+    .data(stateData)
+    .enter()
+    .append("circle")
+    .attr("cx", function(d) {return xLinearScale(d.age); })
+    .attr("cy", function(d) {return yLinearScale(d.smokes); })
+    .attr("r", "15")
+    .attr("fill", "blue")
+    .attr("opacity", ".5");
 
-    
-    })
 }).catch(function(error) {
     console.log(error);
 });
