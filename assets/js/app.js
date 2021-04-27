@@ -13,8 +13,8 @@ if (!svgArea.empty()) {
 
 // svg wrapper dimensions are determined by the current width and
 // height of the browser window.
-var svgWidth = window.innerWidth;
-var svgHeight = window.innerHeight;
+var svgWidth = 900;
+var svgHeight = 500;
 
 var margin = {
     top: 50,
@@ -71,16 +71,25 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     // Add y1-axis to the left side of the display
     chartGroup.append("g").call(leftAxis);
 
-    chartGroup.append("g")
-    .selectAll("circle")
+    var circleGroup = chartGroup.selectAll("circle")
     .data(stateData)
     .enter()
     .append("circle")
-    .attr("cx", function(d) {return xLinearScale(d.age); })
-    .attr("cy", function(d) {return yLinearScale(d.smokes); })
+    .attr("cx", d => xLinearScale(d.age))
+    .attr("cy", d => yLinearScale(d.smokes))
     .attr("r", "15")
     .attr("fill", "blue")
     .attr("opacity", ".5");
+
+    var abbrGroup = chartGroup.selectAll("null")
+    .data(stateData)
+    .enter()
+    .append("text")
+    .text(d => d.abbr)
+    .attr("x", d => xLinearScale(d.age) - 8)
+    .attr("y", d => yLinearScale(d.smokes) + 7)
+    .style("font-size", "13px")
+    .style("font-weight", "bold");
 
 }).catch(function(error) {
     console.log(error);
