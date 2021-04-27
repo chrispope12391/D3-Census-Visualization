@@ -14,13 +14,13 @@ if (!svgArea.empty()) {
 // svg wrapper dimensions are determined by the current width and
 // height of the browser window.
 var svgWidth = 900;
-var svgHeight = 500;
+var svgHeight = 600;
 
 var margin = {
     top: 50,
     right: 50,
-    bottom: 50,
-    left: 50
+    bottom: 70,
+    left: 70
 };
 
 var height = svgHeight - margin.top - margin.bottom;
@@ -89,6 +89,27 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .attr("x", d => xLinearScale(d.age) - 8)
     .attr("y", d => yLinearScale(d.smokes) + 7)
     .style("font-size", "13px")
+    .style("font-weight", "bold");
+
+    var labelsGroup = chartGroup.append("g")
+    .attr("transform", `translate(${width / 2}, ${height + 30})`);
+
+    var hairLengthLabel = labelsGroup.append("text")
+    .attr("x", 0)
+    .attr("y", 30)
+    .attr("value", "age") // value to grab for event listener
+    .classed("active", true)
+    .style("font-size", "16px")
+    .text("Age (Median)");
+
+    chartGroup.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left - 4)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .classed("axis-text", true)
+    .text("Smokes (%)")
+    .style("font-size", "16px")
     .style("font-weight", "bold");
 
 }).catch(function(error) {
