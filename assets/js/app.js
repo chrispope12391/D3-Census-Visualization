@@ -70,7 +70,7 @@ function renderAbbr(abbrGroup, newXscale, chosenXAxis) {
 
     abbrGroup.transition()
         .duration(500)
-        .attr("x", d => newXscale(d[chosenXAxis]));
+        .attr("x", d => newXscale(d[chosenXAxis]) - 8);
     
     return abbrGroup;
 };
@@ -148,7 +148,9 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d.smokes))
     .attr("r", "15")
-    .attr("fill", "blue")
+    .attr("fill", "red")
+    .attr("stroke", "black")
+    .attr("stroke-width", "2")
     .attr("opacity", ".5");
 
     var abbrGroup = chartGroup.selectAll("null")
@@ -157,7 +159,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .append("text")
     .text(d => d.abbr)
     .attr("x", d => xLinearScale(d[chosenXAxis]) - 8)
-    .attr("y", d => yLinearScale(d.smokes) + 7)
+    .attr("y", d => yLinearScale(d.smokes) + 4)
     .style("font-size", "13px")
     .style("font-weight", "bold");
 
