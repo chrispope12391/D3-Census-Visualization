@@ -66,6 +66,15 @@ function renderCircles(circleGroup, newXscale, chosenXAxis) {
     return circleGroup;
 };
 
+function renderAbbr(abbrGroup, newXscale, chosenXAxis) {
+
+    abbrGroup.transition()
+        .duration(500)
+        .attr("x", d => newXscale(d[chosenXAxis]));
+    
+    return abbrGroup;
+};
+
 function updateToolTip(chosenXAxis, circleGroup) {
 
     var label;
@@ -208,6 +217,8 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
 
     var circleGroup = updateToolTip(chosenXAxis, circleGroup);
 
+    var abbrGroup = updateToolTip(chosenXAxis, abbrGroup);
+
     xLabels.selectAll("text")
         .on("click", function() {
             var value = d3.select(this).attr("value");
@@ -224,6 +235,10 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
                 circleGroup = renderCircles(circleGroup, xLinearScale, chosenXAxis);
 
                 circleGroup = updateToolTip(chosenXAxis, circleGroup);
+
+                abbrGroup = renderAbbr(abbrGroup, xLinearScale, chosenXAxis);
+
+                abbrGroup = updateToolTip(chosenXAxis, abbrGroup);
 
                 if (chosenXAxis === "poverty") {
                     povertyLevel
