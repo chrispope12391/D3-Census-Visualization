@@ -14,13 +14,13 @@ if (!svgArea.empty()) {
 // svg wrapper dimensions are determined by the current width and
 // height of the browser window.
 var svgWidth = 900;
-var svgHeight = 600;
+var svgHeight = 700;
 
 var margin = {
     top: 50,
     right: 50,
-    bottom: 70,
-    left: 70
+    bottom: 120,
+    left: 100
 };
 
 var height = svgHeight - margin.top - margin.bottom;
@@ -56,10 +56,6 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .range([height, 0])
     .domain(d3.extent(stateData, d => d.smokes));
 
-
-    // var ageMax = d3.max(stateData, d => d.age);
-    // var smokesMax = d3.max(stateData, d => d.smokes);
-
     // Create axis functions
     var bottomAxis = d3.axisBottom(xLinearScale)
     var leftAxis = d3.axisLeft(yLinearScale);
@@ -91,26 +87,70 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .style("font-size", "13px")
     .style("font-weight", "bold");
 
-    var labelsGroup = chartGroup.append("g")
+    var xLabels = chartGroup.append("g")
     .attr("transform", `translate(${width / 2}, ${height + 30})`);
 
-    var hairLengthLabel = labelsGroup.append("text")
+    var yLabels = chartGroup.append("g")
+    .attr("transform", "rotate(-90)", `translate(${width}, ${height + 90})`);
+
+    var medianAge = xLabels.append("text")
     .attr("x", 0)
-    .attr("y", 30)
+    .attr("y", 20)
     .attr("value", "age") // value to grab for event listener
     .classed("active", true)
     .style("font-size", "16px")
     .text("Age (Median)");
 
-    chartGroup.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left - 4)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .classed("axis-text", true)
-    .text("Smokes (%)")
+    var povertyLevel = xLabels.append("text")
+    .attr("x", 0)
+    .attr("y", 45)
+    .attr("value", "poverty") // value to grab for event listener
+    .classed("inactive", true)
     .style("font-size", "16px")
-    .style("font-weight", "bold");
+    .text("In Poverty (%)");
+
+    var income = xLabels.append("text")
+    .attr("x", 0)
+    .attr("y", 70)
+    .attr("value", "income") // value to grab for event listener
+    .classed("inactive", true)
+    .style("font-size", "16px")
+    .text("Household Income (Median)");
+
+    var smokePercent = yLabels.append("text")
+    .attr("x", 0- 280)
+    .attr("y", 0 - 80)
+    .attr("value", "smokes")
+    .classed("inactive", true)
+    .style("font-size", "16px")
+    .text("Obese (%)");
+
+    var smokePercent = yLabels.append("text")
+    .attr("x", 0- 280)
+    .attr("y", 0 - 55)
+    .attr("value", "smokes")
+    .classed("inactive", true)
+    .style("font-size", "16px")
+    .text("Lacks Healthcare (%)");
+
+    var smokePercent = yLabels.append("text")
+    .attr("x", 0- 280)
+    .attr("y", 0 - 30)
+    .attr("value", "smokes")
+    .classed("active", true)
+    .style("font-size", "16px")
+    .text("Smokes (%)");
+
+
+    // chartGroup.append("text")
+    // .attr("transform", "rotate(-90)")
+    // .attr("y", 0 - margin.left - 4)
+    // .attr("x", 0 - (height / 2))
+    // .attr("dy", "1em")
+    // .classed("axis-text", true)
+    // .text("Smokes (%)")
+    // .style("font-size", "16px")
+    // .style("font-weight", "bold");
 
 }).catch(function(error) {
     console.log(error);
