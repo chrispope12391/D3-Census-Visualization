@@ -36,6 +36,7 @@ var chartGroup = svg.append("g")
 .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 var chosenXAxis = "age";
+var chosenYAxis = "smokes";
 
 function xScale(stateData, chosenXAxis) {
 
@@ -46,6 +47,15 @@ function xScale(stateData, chosenXAxis) {
     return xLinearScale;
 
 };
+
+function yScale(stateData, chosenYAxis) {
+
+    var yLinearScale = d3.scaleLinear()
+    .range([height, 0])
+    .domain(d3.extent(stateData, d => d[chosenYAxis]));
+
+    return yLinearScale;
+}
 
 function renderAxes(newXscale, xAxis) {
     var bottomAxis = d3.axisBottom(newXscale);
@@ -125,9 +135,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
 
     var xLinearScale = xScale(stateData, chosenXAxis);
 
-    var yLinearScale = d3.scaleLinear()
-    .range([height, 0])
-    .domain(d3.extent(stateData, d => d.smokes));
+    var yLinearScale = yScale(stateData, chosenYAxis);
 
     // Create axis functions
     var bottomAxis = d3.axisBottom(xLinearScale);
@@ -193,18 +201,18 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .style("font-size", "16px")
     .text("Household Income (Median)");
 
-    var smokePercent = yLabels.append("text")
+    var obesePercent = yLabels.append("text")
     .attr("x", 0- 280)
     .attr("y", 0 - 80)
-    .attr("value", "smokes")
+    .attr("value", "obese")
     .classed("inactive", true)
     .style("font-size", "16px")
     .text("Obese (%)");
 
-    var smokePercent = yLabels.append("text")
+    var healthcarePercent = yLabels.append("text")
     .attr("x", 0- 280)
     .attr("y", 0 - 55)
-    .attr("value", "smokes")
+    .attr("value", "healthcare")
     .classed("inactive", true)
     .style("font-size", "16px")
     .text("Lacks Healthcare (%)");
