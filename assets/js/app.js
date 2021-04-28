@@ -35,7 +35,73 @@ var svg = d3.select("#scatter")
 var chartGroup = svg.append("g")
 .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-d3.csv("assets/data/data.csv").then(function(stateData) {
+var chosenXAxis = "age";
+
+function xScale(stateData, chosenXAxis) {
+
+    var xLinearScale = d3.scaleLinear()
+    .range([0, width])
+    .domain(d3.extent(stateData, d => d[chosenXAxis]));
+
+    return xLinearScale;
+
+};
+
+function renderAxes(newXscale, xAxis) {
+    var bottomAxis = d3.axisBottom(newXscale);
+
+    xAxis.transition()
+        .duration(500)
+        .call(bottomAxis);
+
+    return xAxis;
+};
+
+function renderCircles(circleGroup, newXscale, chosenXAxis) {
+
+    circleGroup.transition()
+        .duration(500)
+        .attr("cx", d => newXscale(d[chosenXAxis]));
+    
+    return circleGroup;
+};
+
+function updateToolTip(chosenXAxis, circleGroup) {
+
+    var label;
+
+    if (chosenXAxis === "age") {
+        label = "Median Age:";
+    }
+    else if (chosenXAxis === "poverty") {
+        label = "Poverty Percentage:";
+    }
+    else {
+        label = "Median Household Income:";
+    }
+
+    var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .offset([80,-60])
+    .html(function(d) {
+        return (`${d.age}<br>${label} ${d[chosenXAxis]}`);
+    });
+
+    circleGroup.call(toolTip);
+
+    circleGroup.on("mouseover", function(data) {
+        toolTip.show(data,this);
+    })
+        .on("mouseout", function(data,index) {
+            toolTip.hide(data);
+        });
+
+    return circleGroup;
+};
+
+
+d3.csv("assets/data/data.csv").then(function(stateData, err) {
+    if (err) throw err;
 
     console.log(stateData);
 
@@ -48,19 +114,18 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
         data.smokes = +data.smokes;
     });
 
-    var xLinearScale = d3.scaleLinear()
-    .range([0, width])
-    .domain(d3.extent(stateData, d => d.age));
+    var xLinearScale = xScale(stateData, chosenXAxis);
 
     var yLinearScale = d3.scaleLinear()
     .range([height, 0])
     .domain(d3.extent(stateData, d => d.smokes));
 
     // Create axis functions
-    var bottomAxis = d3.axisBottom(xLinearScale)
+    var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
-    chartGroup.append("g")
+    var xAxis = chartGroup.append("g")
+    .classed("x-axis", true)
         .attr("transform", `translate(0, ${height})`)
         .call(bottomAxis);
 
@@ -71,7 +136,7 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .data(stateData)
     .enter()
     .append("circle")
-    .attr("cx", d => xLinearScale(d.age))
+    .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d.smokes))
     .attr("r", "15")
     .attr("fill", "blue")
@@ -82,7 +147,7 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .enter()
     .append("text")
     .text(d => d.abbr)
-    .attr("x", d => xLinearScale(d.age) - 8)
+    .attr("x", d => xLinearScale(d[chosenXAxis]) - 8)
     .attr("y", d => yLinearScale(d.smokes) + 7)
     .style("font-size", "13px")
     .style("font-weight", "bold");
@@ -140,6 +205,61 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .classed("active", true)
     .style("font-size", "16px")
     .text("Smokes (%)");
+
+    var circleGroup = updateToolTip(chosenXAxis, circleGroup);
+
+    xLabels.selectAll("text")
+        .on("click", function() {
+            var value = d3.select(this).attr("value");
+            if (value !== chosenXAxis) {
+
+                chosenXAxis = value;
+
+                console.log(chosenXAxis);
+
+                xLinearScale = xScale(stateData, chosenXAxis);
+
+                xAxis = renderAxes(xLinearScale, xAxis);
+
+                circleGroup = renderCircles(circleGroup, xLinearScale, chosenXAxis);
+
+                circleGroup = updateToolTip(chosenXAxis, circleGroup);
+
+                if (chosenXAxis === "poverty") {
+                    povertyLevel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                    medianAge
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    income
+                    .classed("active", false)
+                    .classed("inactive", true);
+                }
+                else if (chosenXAxis === "income") {
+                    income
+                    .classed("active", true)
+                    .classed("inactive", false);
+                    povertyLevel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    medianAge
+                    .classed("active", false)
+                    .classed("inactive", true);
+                }
+                else {
+                    income
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    povertyLevel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    medianAge
+                    .classed("active", true)
+                    .classed("inactive", false);
+                }
+            }
+        });
 
 
     // chartGroup.append("text")
