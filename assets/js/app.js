@@ -82,9 +82,9 @@ function updateToolTip(chosenXAxis, circleGroup) {
 
     var toolTip = d3.tip()
     .attr("class", "tooltip")
-    .offset([80,-60])
+    .offset([80,-80])
     .html(function(d) {
-        return (`${d.age}<br>${label} ${d[chosenXAxis]}`);
+        return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
     });
 
     circleGroup.call(toolTip);
