@@ -67,11 +67,30 @@ function renderAxes(newXscale, xAxis) {
     return xAxis;
 };
 
+function renderYAxes(newYscale, yAxis) {
+    var leftAxis = d3.axisLeft(newYscale);
+
+    yAxis.transition()
+        .duration(500)
+        .call(leftAxis);
+
+    return yAxis;
+};
+
 function renderCircles(circleGroup, newXscale, chosenXAxis) {
 
     circleGroup.transition()
         .duration(500)
         .attr("cx", d => newXscale(d[chosenXAxis]));
+    
+    return circleGroup;
+};
+
+function renderYCircles(circleGroup, newYscale, chosenYAxis) {
+
+    circleGroup.transition()
+        .duration(500)
+        .attr("cy", d => newYscale(d[chosenYAxis]));
     
     return circleGroup;
 };
@@ -84,6 +103,16 @@ function renderAbbr(abbrGroup, newXscale, chosenXAxis) {
     
     return abbrGroup;
 };
+
+function renderYAbbr(abbrGroup, newYscale, chosenYAxis) {
+
+    abbrGroup.transition()
+        .duration(500)
+        .attr("y", d => newYscale(d[chosenYAxis]) + 4);
+    
+    return abbrGroup;
+};
+
 
 function updateToolTip(chosenXAxis, circleGroup) {
 
@@ -118,6 +147,38 @@ function updateToolTip(chosenXAxis, circleGroup) {
     return circleGroup;
 };
 
+function updateYToolTip(chosenYAxis, circleGroup) {
+
+    var label;
+
+    if (chosenYAxis === "smokes") {
+        label = "Smokes Percentage:";
+    }
+    else if (chosenYAxis === "healthcare") {
+        label = "Percentae Lacking Healthcare:";
+    }
+    else {
+        label = "Obesity Percentage:";
+    }
+
+    var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .offset([80,-80])
+    .html(function(d) {
+        return (`${d.state}<br>${label} ${d[chosenYAxis]}`);
+    });
+
+    circleGroup.call(toolTip);
+
+    circleGroup.on("mouseover", function(data) {
+        toolTip.show(data,this);
+    })
+        .on("mouseout", function(data,index) {
+            toolTip.hide(data);
+        });
+
+    return circleGroup;
+};
 
 d3.csv("assets/data/data.csv").then(function(stateData, err) {
     if (err) throw err;
@@ -133,6 +194,9 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
         data.smokes = +data.smokes;
     });
 
+
+    
+
     var xLinearScale = xScale(stateData, chosenXAxis);
 
     var yLinearScale = yScale(stateData, chosenYAxis);
@@ -147,14 +211,14 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
         .call(bottomAxis);
 
     // Add y1-axis to the left side of the display
-    chartGroup.append("g").call(leftAxis);
+    var yAxis = chartGroup.append("g").call(leftAxis);
 
     var circleGroup = chartGroup.selectAll("circle")
     .data(stateData)
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    .attr("cy", d => yLinearScale(d.smokes))
+    .attr("cy", d => yLinearScale(d[chosenYAxis]))
     .attr("r", "15")
     .attr("fill", "red")
     .attr("stroke", "black")
@@ -167,7 +231,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .append("text")
     .text(d => d.abbr)
     .attr("x", d => xLinearScale(d[chosenXAxis]) - 8)
-    .attr("y", d => yLinearScale(d.smokes) + 4)
+    .attr("y", d => yLinearScale(d[chosenYAxis]) + 4)
     .style("font-size", "13px")
     .style("font-weight", "bold");
 
@@ -204,7 +268,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     var obesePercent = yLabels.append("text")
     .attr("x", 0- 280)
     .attr("y", 0 - 80)
-    .attr("value", "obese")
+    .attr("value", "obesity")
     .classed("inactive", true)
     .style("font-size", "16px")
     .text("Obese (%)");
@@ -228,6 +292,10 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     var circleGroup = updateToolTip(chosenXAxis, circleGroup);
 
     var abbrGroup = updateToolTip(chosenXAxis, abbrGroup);
+
+    var circleGroup = updateYToolTip(chosenYAxis, circleGroup);
+
+    var abbrGroup = updateYToolTip(chosenYAxis, abbrGroup);
 
     xLabels.selectAll("text")
         .on("click", function() {
@@ -286,16 +354,63 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
             }
         });
 
+        yLabels.selectAll("text")
+        .on("click", function() {
+            var value = d3.select(this).attr("value");
+            if (value !== chosenYAxis) {
 
-    // chartGroup.append("text")
-    // .attr("transform", "rotate(-90)")
-    // .attr("y", 0 - margin.left - 4)
-    // .attr("x", 0 - (height / 2))
-    // .attr("dy", "1em")
-    // .classed("axis-text", true)
-    // .text("Smokes (%)")
-    // .style("font-size", "16px")
-    // .style("font-weight", "bold");
+                chosenYAxis = value;
+
+                console.log(chosenYAxis);
+
+                yLinearScale = yScale(stateData, chosenYAxis);
+
+                yAxis = renderYAxes(yLinearScale, yAxis);
+
+                circleGroup = renderYCircles(circleGroup, yLinearScale, chosenYAxis);
+
+                circleGroup = updateYToolTip(chosenYAxis, circleGroup);
+
+                abbrGroup = renderYAbbr(abbrGroup, yLinearScale, chosenYAxis);
+
+                abbrGroup = updateYToolTip(chosenYAxis, abbrGroup);
+
+                if (chosenYAxis === "healthcare") {
+                    healthcarePercent
+                    .classed("active", true)
+                    .classed("inactive", false);
+                    smokePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    obesePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                }
+                else if (chosenYAxis === "obesity") {
+                    obesePercent
+                    .classed("active", true)
+                    .classed("inactive", false);
+                    healthcarePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    smokePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                }
+                else {
+                    obesePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    healthcarePercent
+                    .classed("active", false)
+                    .classed("inactive", true);
+                    smokePercent
+                    .classed("active", true)
+                    .classed("inactive", false);
+                }
+            }
+        });
+
 
 }).catch(function(error) {
     console.log(error);
