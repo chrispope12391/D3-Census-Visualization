@@ -132,6 +132,8 @@ function updateToolTip(chosenXAxis, circleGroup) {
 
     var label;
 
+    var labelY;
+
     if (chosenXAxis === "age") {
         label = "Median Age:";
     }
@@ -142,11 +144,21 @@ function updateToolTip(chosenXAxis, circleGroup) {
         label = "Median Household Income:";
     }
 
+    if (chosenYAxis === "smokes") {
+        labelY = "Smokes Percentage:";
+    }
+    else if (chosenYAxis === "healthcare") {
+        labelY = "Percentae Lacking Healthcare:";
+    }
+    else {
+        labelY = "Obesity Percentage:";
+    }
+
     var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80,-80])
     .html(function(d) {
-        return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+        return (`${d.state}<br>${labelY} ${d[chosenYAxis]} <br>${label} ${d[chosenXAxis]}`);
     });
 
     circleGroup.call(toolTip);
@@ -164,6 +176,8 @@ function updateToolTip(chosenXAxis, circleGroup) {
 function updateYToolTip(chosenYAxis, circleGroup) {
 
     var label;
+
+    var labelX;
 
     if (chosenYAxis === "smokes") {
         label = "Smokes Percentage:";
