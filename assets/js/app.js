@@ -23,21 +23,27 @@ var margin = {
     left: 100
 };
 
+
 var height = svgHeight - margin.top - margin.bottom;
 var width = svgWidth - margin.left - margin.right;
 
 
+// Create an SVG wrapper, append an SVG group that will hold our chart,
+// and shift the latter by left and top margins.
 var svg = d3.select("#scatter")
 .append("svg")
 .attr("height", svgHeight)
 .attr("width", svgWidth);
 
+// Apend an SVG group
 var chartGroup = svg.append("g")
 .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+// Initial Params
 var chosenXAxis = "age";
 var chosenYAxis = "smokes";
 
+//function used for updated x-scale var upon clock on acis label
 function xScale(stateData, chosenXAxis) {
 
     var xLinearScale = d3.scaleLinear()
@@ -48,6 +54,7 @@ function xScale(stateData, chosenXAxis) {
 
 };
 
+//function used for updated y-scale var upon clock on axis label
 function yScale(stateData, chosenYAxis) {
 
     var yLinearScale = d3.scaleLinear()
@@ -57,6 +64,7 @@ function yScale(stateData, chosenYAxis) {
     return yLinearScale;
 }
 
+// function used for updating xAxis var upon click on axis label
 function renderAxes(newXscale, xAxis) {
     var bottomAxis = d3.axisBottom(newXscale);
 
@@ -67,6 +75,7 @@ function renderAxes(newXscale, xAxis) {
     return xAxis;
 };
 
+// function used for updating yAxis var upon click on axis label
 function renderYAxes(newYscale, yAxis) {
     var leftAxis = d3.axisLeft(newYscale);
 
@@ -77,6 +86,8 @@ function renderYAxes(newYscale, yAxis) {
     return yAxis;
 };
 
+// function used for updating circles group with a transition to
+// new circles by xaxis change
 function renderCircles(circleGroup, newXscale, chosenXAxis) {
 
     circleGroup.transition()
@@ -86,6 +97,8 @@ function renderCircles(circleGroup, newXscale, chosenXAxis) {
     return circleGroup;
 };
 
+// function used for updating circles group with a transition to
+// new circles by yaxis change
 function renderYCircles(circleGroup, newYscale, chosenYAxis) {
 
     circleGroup.transition()
@@ -94,6 +107,7 @@ function renderYCircles(circleGroup, newYscale, chosenYAxis) {
     
     return circleGroup;
 };
+
 
 function renderAbbr(abbrGroup, newXscale, chosenXAxis) {
 
@@ -161,11 +175,21 @@ function updateYToolTip(chosenYAxis, circleGroup) {
         label = "Obesity Percentage:";
     }
 
+    if (chosenXAxis === "age") {
+        labelX = "Median Age:";
+    }
+    else if (chosenXAxis === "poverty") {
+        labelX = "Poverty Percentage:";
+    }
+    else {
+        labelX = "Median Household Income:";
+    }
+
     var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80,-80])
     .html(function(d) {
-        return (`${d.state}<br>${label} ${d[chosenYAxis]}`);
+        return (`${d.state}<br>${label} ${d[chosenYAxis]}<br>${labelX} ${d[chosenXAxis]}`);
     });
 
     circleGroup.call(toolTip);
