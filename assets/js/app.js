@@ -13,8 +13,8 @@ if (!svgArea.empty()) {
 
 // svg wrapper dimensions are determined by the current width and
 // height of the browser window.
-var svgWidth = 900;
-var svgHeight = 700;
+var svgWidth = 1100;
+var svgHeight = 850;
 
 var margin = {
     top: 50,
@@ -127,7 +127,7 @@ function renderYAbbr(abbrGroup, newYscale, chosenYAxis) {
     return abbrGroup;
 };
 
-
+// function used for updating circles group with new tooltip
 function updateToolTip(chosenXAxis, circleGroup) {
 
     var label;
@@ -173,6 +173,7 @@ function updateToolTip(chosenXAxis, circleGroup) {
     return circleGroup;
 };
 
+// function used for updating circles group with new tooltip
 function updateYToolTip(chosenYAxis, circleGroup) {
 
     var label;
@@ -218,6 +219,7 @@ function updateYToolTip(chosenYAxis, circleGroup) {
     return circleGroup;
 };
 
+// Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(stateData, err) {
     if (err) throw err;
 
@@ -235,14 +237,18 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
 
     
 
+  // xLinearScale function above csv import
     var xLinearScale = xScale(stateData, chosenXAxis);
 
+    
+  // yLinearScale function above csv import
     var yLinearScale = yScale(stateData, chosenYAxis);
 
     // Create axis functions
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
+    //append x axis
     var xAxis = chartGroup.append("g")
     .classed("x-axis", true)
         .attr("transform", `translate(0, ${height})`)
@@ -251,6 +257,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     // Add y1-axis to the left side of the display
     var yAxis = chartGroup.append("g").call(leftAxis);
 
+    //append initial circles
     var circleGroup = chartGroup.selectAll("circle")
     .data(stateData)
     .enter()
@@ -263,6 +270,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .attr("stroke-width", "2")
     .attr("opacity", ".5");
 
+    //append abbreviations to circles
     var abbrGroup = chartGroup.selectAll("null")
     .data(stateData)
     .enter()
@@ -273,12 +281,16 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .style("font-size", "13px")
     .style("font-weight", "bold");
 
+    //create group for x-axis labels
     var xLabels = chartGroup.append("g")
     .attr("transform", `translate(${width / 2}, ${height + 30})`);
 
+        //create group for y-axis labels
     var yLabels = chartGroup.append("g")
     .attr("transform", "rotate(-90)", `translate(${width}, ${height + 90})`);
 
+
+    //labels
     var medianAge = xLabels.append("text")
     .attr("x", 0)
     .attr("y", 20)
@@ -327,6 +339,8 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
     .style("font-size", "16px")
     .text("Smokes (%)");
 
+
+    //updated tool tops
     var circleGroup = updateToolTip(chosenXAxis, circleGroup);
 
     var abbrGroup = updateToolTip(chosenXAxis, abbrGroup);
@@ -335,6 +349,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
 
     var abbrGroup = updateYToolTip(chosenYAxis, abbrGroup);
 
+      // x axis labels event listener
     xLabels.selectAll("text")
         .on("click", function() {
             var value = d3.select(this).attr("value");
@@ -392,6 +407,7 @@ d3.csv("assets/data/data.csv").then(function(stateData, err) {
             }
         });
 
+          // y axis labels event listener
         yLabels.selectAll("text")
         .on("click", function() {
             var value = d3.select(this).attr("value");
