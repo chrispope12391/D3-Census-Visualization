@@ -1,4 +1,4 @@
-# D3-Challenge
+# D3-Census-Visualization
 Using HTML create a website that generates a scatter that compares 2014 census information against each other with multiple indexes on the X & Y axis. When you toggle a new index the graph changes is populated by the selected axis' data.
 
 ## Getting Stated 
