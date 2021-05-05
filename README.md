@@ -3,7 +3,7 @@ Using HTML create a website that generates a scatter that compares 2014 census i
 
 ## Getting Stated 
 
-1. Create a new repository and title it as you please. My repository is titled "D3-Challenge".
+1. Create a new repository and title it as you please. My repository is titled "D3-Census-Visualization".
 
 1. Clone the new repository to your computer.
 
